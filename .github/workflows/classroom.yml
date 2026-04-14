@@ -1,0 +1,76 @@
+name: Autograding
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  autograding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        id: tests
+        run: |
+          pytest tests/ -v --tb=short 2>&1 | tee test_output.txt || true
+
+      - name: AI Review
+        if: always()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/ai_review.py
+
+      - name: Post feedback
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let feedback = 'No se pudo generar feedback de IA.';
+            try { feedback = fs.readFileSync('ai_feedback.md', 'utf8'); } catch(e) {}
+            let testOutput = 'Sin resultados de tests.';
+            try { testOutput = fs.readFileSync('test_output.txt', 'utf8'); } catch(e) {}
+
+            const body = [
+              '## 🤖 Resultado de la corrección automática',
+              '',
+              '### Tests automáticos',
+              '```',
+              testOutput.slice(0, 3000),
+              '```',
+              '',
+              '### Feedback del revisor IA',
+              '',
+              feedback,
+            ].join('\n');
+
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: body,
+              });
+            } else {
+              await github.rest.repos.createCommitComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: context.sha,
+                body: body,
+              });
+            }

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+notebook/executed.ipynb
+.pytest_cache/
