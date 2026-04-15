@@ -35,11 +35,29 @@ Completa el notebook `notebook/practica_churn.ipynb` siguiendo las secciones:
 6. **Top 3 features** — Usa `feature_importances_` para identificar las 3 variables más importantes. Gráfico de barras + explicación en markdown
 7. **Conclusiones** — Interpreta los resultados: ¿tiene sentido lo que dice el modelo? ¿Qué recomendarías al equipo de retención?
 
-## Entrega
+## Cómo entregar
 
-- Haz push de tu notebook completado a la rama `main`
-- Los tests automáticos se ejecutarán al hacer push
-- Recibirás feedback automático (tests + revisión IA) como comentario en tu commit
+Esta práctica usa un flujo basado en **Pull Requests**. No puedes hacer push directo a `main`.
+
+1. **Crea una rama de entrega**:
+   ```bash
+   git checkout -b entrega
+   ```
+2. **Completa la práctica y commitea**:
+   ```bash
+   git add .
+   git commit -m "Mi entrega"
+   ```
+3. **Sube la rama**:
+   ```bash
+   git push -u origin entrega
+   ```
+4. **Abre un Pull Request** desde la web de GitHub (`entrega` → `main`).
+5. **Recibirás feedback automáticamente** en el PR:
+   - Resultados de los tests (pytest)
+   - Revisión del código con IA (Claude)
+6. **Itera**: cada nuevo commit que hagas en la rama `entrega` dispara una nueva revisión y actualiza el PR.
+7. **Cerrar entrega**: haz merge del PR a `main` cuando los tests pasen y estés contento con el feedback. Solo podrás mergear si los tests pasan.
 
 ## Evaluación
 
